@@ -1,0 +1,59 @@
+﻿@{
+    ViewData["Title"] = "Student Graph";
+}
+
+<h2 class="chart-title">Students by Program</h2>
+<button id="showGraphBtn" class="btn-show-graph">Show Graph</button>
+<canvas id="studentGraph" class="pie-chart" style="max-width: 600px; max-height: 400px;"></canvas>
+
+<!-- External Libraries -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+<script>
+    $(document).ready(function () {
+        var chartInstance; 
+
+        $('#showGraphBtn').click(function () {
+            $.post('/Student/GetStudentData', function (response) {
+                const ctx = document.getElementById('studentGraph').getContext('2d');
+
+                
+                if (chartInstance) {
+                    chartInstance.destroy();
+                }
+
+                chartInstance = new Chart(ctx, {
+                    type: 'pie', 
+                    data: {
+                        labels: response.labels,
+                        datasets: [{
+                            label: 'Number of Students',
+                            data: response.data,
+                            backgroundColor: ['red', 'blue', 'green', 'yellow', 'purple']
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function (tooltipItem) {
+                                        return tooltipItem.label + ': ' + tooltipItem.raw;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            });
+        });
+    });
+</script>
+
+<!-- Custom CSS -->
+
